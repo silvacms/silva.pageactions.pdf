@@ -13,7 +13,7 @@ from five import grok
 import popen2
 
 
-class PDFPage(silvaviews.Template):
+class PDFPage(silvaviews.View):
 
     grok.name('index.pdf')
 
