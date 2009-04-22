@@ -3,6 +3,6 @@
    i18n:domain="pageactions">
 
   <a href="${path:context/@@absolute_url}/@@index.pdf"
-     class="pdf-pageaction" i18n:translate="">PDF</a>
+     class="pdf-pageaction"><span i18n:translate="">PDF</span></a>
 
 </tal:block>
