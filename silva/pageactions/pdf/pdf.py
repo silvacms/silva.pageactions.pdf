@@ -21,12 +21,12 @@ class PDFPage(silvaviews.View):
         """Convert the current page as a PDF.
         """
 
-        print_html = component.getMultiAdapter((self.context, self.request),
-                                               name='print.html')()
+        print_html = component.getMultiAdapter(
+            (self.context, self.request), name='print.html')()
         print_html = print_html.encode('cp1252', 'replace')
         (stdout, stdin) = popen2.popen2((
-            """htmldoc --charset cp-1252 --header . --fontsize 10 --bodyfont helvetica """
-            """--webpage -t pdf --quiet --jpeg - """))
+            """htmldoc --charset cp-1252 --header . --fontsize 10 """
+            """--bodyfont helvetica --webpage -t pdf --quiet --jpeg - """))
 
         stdin.write(print_html)
         stdin.close()
@@ -40,9 +40,13 @@ class PDFPage(silvaviews.View):
         """
 
         pdf = self.pdf()
-        self.response.setHeader('Content-type', 'application/pdf')
+        filename = self.context.getId()
         self.response.setHeader(
-            'Content-disposition', 'inline; filename="%s.pdf"' % (self.context.getId()))
+            'Content-type', 'application/pdf')
+        self.response.setHeader(
+            'Content-disposition', 'inline; filename="%s.pdf"' % filename)
+        self.response.setHeader(
+            'Cache-Control', 'max-age=7200, must-revalidate')
         return pdf
 
 
