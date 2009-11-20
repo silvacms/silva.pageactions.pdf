@@ -5,8 +5,9 @@
 
 from zope import component
 
-from silva.pageactions.base.base import PageAction
 from silva.core.views import views as silvaviews
+from silva.core.views.interfaces import IHTTPResponseHeaders
+from silva.pageactions.base.base import PageAction
 
 from five import grok
 
@@ -16,6 +17,17 @@ import popen2
 class PDFPage(silvaviews.View):
 
     grok.name('index.pdf')
+
+    def HEAD(self):
+        """Set head information.
+        """
+        filename = self.context.getId()
+        headers = {'Content-type':
+                       'application/pdf',
+                   'Content-disposition':
+                       'inline; filename="%s.pdf"' % filename}
+        component.getMultiAdapter(
+            (self.context, self.request), IHTTPResponseHeaders)(**headers)
 
     def pdf(self):
         """Convert the current page as a PDF.
@@ -40,13 +52,7 @@ class PDFPage(silvaviews.View):
         """
 
         pdf = self.pdf()
-        filename = self.context.getId()
-        self.response.setHeader(
-            'Content-type', 'application/pdf')
-        self.response.setHeader(
-            'Content-disposition', 'inline; filename="%s.pdf"' % filename)
-        self.response.setHeader(
-            'Cache-Control', 'max-age=7200, must-revalidate')
+        self.HEAD()
         return pdf
 
 
