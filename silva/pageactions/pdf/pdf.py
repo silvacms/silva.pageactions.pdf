@@ -3,19 +3,16 @@
 # See also LICENSE.txt
 # $Id$
 
-from zope import component
+import popen2
 
+from five import grok
 from silva.core.views import views as silvaviews
 from silva.core.views.interfaces import IHTTPResponseHeaders
 from silva.pageactions.base.base import PageAction
-
-from five import grok
-
-import popen2
+from zope import component
 
 
 class PDFPage(silvaviews.View):
-
     grok.name('index.pdf')
 
     def HEAD(self):
@@ -27,7 +24,7 @@ class PDFPage(silvaviews.View):
                    'Content-disposition':
                        'inline; filename="%s.pdf"' % filename}
         component.getMultiAdapter(
-            (self.context, self.request), IHTTPResponseHeaders)(**headers)
+            (self.request, self.context), IHTTPResponseHeaders)(**headers)
 
     def pdf(self):
         """Convert the current page as a PDF.
@@ -57,5 +54,4 @@ class PDFPage(silvaviews.View):
 
 
 class PDFAction(PageAction):
-
     grok.order(30)
