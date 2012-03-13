@@ -25,7 +25,7 @@ setup(name='silva.pageactions.pdf',
       zip_safe=False,
       install_requires=[
         'five.grok',
-        'megrok.chameleon',
+        'grokcore.chameleon',
         'setuptools',
         'silva.core.views',
         'silva.pageactions.base',
