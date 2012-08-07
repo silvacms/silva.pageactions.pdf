@@ -7,43 +7,48 @@ import subprocess
 
 from five import grok
 from silva.core.views import views as silvaviews
-from silva.core.views.interfaces import IHTTPResponseHeaders
+from silva.core.views.httpheaders import ResponseHeaders
+from zope.publisher.interfaces.browser import IBrowserRequest
 from silva.pageactions.base.base import PageAction
-from zope import component
+from zope.component import getMultiAdapter
 
 
 class PDFPage(silvaviews.View):
     grok.name('index.pdf')
 
-    def HEAD(self):
-        """Set head information.
-        """
-        filename = self.context.getId()
-        headers = {'Content-type':
-                       'application/pdf',
-                   'Content-disposition':
-                       'inline; filename="%s.pdf"' % filename}
-        component.getMultiAdapter(
-            (self.request, self.context), IHTTPResponseHeaders)(**headers)
-
     def pdf(self):
         """Convert the current page as a PDF.
         """
-        print_html = component.getMultiAdapter(
-            (self.context, self.request), name='print.html')().encode('cp1252', 'replace')
+        html_view = getMultiAdapter(
+            (self.context, self.request), name='print.html')
+        html_print = html_view().encode('cp1252', 'replace')
         command = subprocess.Popen(
             """htmldoc --charset cp-1252 --header . --fontsize 10 """
             """--bodyfont helvetica --webpage -t pdf --quiet --jpeg - """,
-            shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        pdf, error = command.communicate(input=print_html)
+            shell=True,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
+        pdf, error = command.communicate(input=html_print)
         return pdf
 
     def render(self):
         """Converts a HTML-Page to a PDF-Document.
         """
-        pdf = self.pdf()
-        self.HEAD()
-        return pdf
+        return self.pdf()
+
+
+class PDFResponseHeader(ResponseHeaders):
+    grok.adapts(IBrowserRequest, PDFPage)
+
+    def other_headers(self, headers):
+        identifier = self.context.context.getId()
+        self.response.setHeader(
+            'Content-type',
+            'application/pdf')
+        self.response.setHeader(
+            'Content-disposition',
+            'inline; filename="%s.pdf"' % identifier)
 
 
 class PDFAction(PageAction):
