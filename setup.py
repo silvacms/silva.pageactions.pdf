@@ -5,7 +5,7 @@ version = '1.0.2dev'
 
 setup(name='silva.pageactions.pdf',
       version=version,
-      description="Create a PDF out of the current page in Silva.",
+      description="Create a PDF out of the current page in Silva CMS",
       long_description=open("README.txt").read() + "\n" +
                        open(os.path.join("docs", "HISTORY.txt")).read(),
       classifiers=[
@@ -16,7 +16,7 @@ setup(name='silva.pageactions.pdf',
       keywords='silva page actions pdf',
       author='Infrae',
       author_email='info@infrae.com',
-      url='',
+      url='https://github.com/silvacms/silva.pageactions.pdf',
       license='BSD',
       package_dir={'': 'src'},
       packages=find_packages('src'),
